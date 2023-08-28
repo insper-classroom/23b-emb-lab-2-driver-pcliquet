@@ -117,25 +117,32 @@ void _pio_set_input(Pio *p_pio, const uint32_t ul_mask,const uint32_t ul_attribu
 	
 }
 
-void _pio_set_output(Pio *p_pio, const uint32_t ul_mask, const uint32_t ul_default_level,
+
+void pio_set_output(Pio *p_pio, const uint32_t ul_mask,
+const uint32_t ul_default_level,
 const uint32_t ul_multidrive_enable,
 const uint32_t ul_pull_up_enable)
 {
-	_pio_pull_up(p_pio,ul_mask,ul_default_level & ul_multidrive_enable & ul_pull_up_enable);
+
+	_pio_pull_up(p_pio, ul_mask, ul_pull_up_enable);
+
+	/* Enable multi-drive if necessary */
 	if (ul_multidrive_enable) {
-		p_pio->PIO_PER = ul_mask;
+		p_pio->PIO_MDER = ul_mask;
 		} else {
-		p_pio->PIO_PDR = ul_mask;
-		
+		p_pio->PIO_MDDR = ul_mask;
 	}
-	
+
+	/* Set default value */
 	if (ul_default_level) {
 		p_pio->PIO_SODR = ul_mask;
 		} else {
 		p_pio->PIO_CODR = ul_mask;
 	}
-	
 
+	/* Configure pin(s) as output(s) */
+	p_pio->PIO_OER = ul_mask;
+	p_pio->PIO_PER = ul_mask;
 }
 
 uint32_t _pio_get(Pio *p_pio, const pio_type_t ul_type,
@@ -192,6 +199,7 @@ void init(void)
 	pmc_enable_periph_clk(BUT_PIO_ID_1);
 	pmc_enable_periph_clk(BUT_PIO_ID_2);
 	pmc_enable_periph_clk(BUT_PIO_ID_3);
+	
 	
 
 	_pio_set_input(BUT_PIO_1, BUT_PIO_IDX_MASK_1, _PIO_PULLUP | _PIO_DEBOUNCE);
