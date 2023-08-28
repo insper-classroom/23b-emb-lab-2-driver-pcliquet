@@ -121,8 +121,6 @@ void _pio_set_output(Pio *p_pio, const uint32_t ul_mask, const uint32_t ul_defau
 const uint32_t ul_multidrive_enable,
 const uint32_t ul_pull_up_enable)
 {
-	p_pio->PIO_OER = ul_mask;
-	p_pio->PIO_PER = ul_mask;
 	_pio_pull_up(p_pio,ul_mask,ul_default_level & ul_multidrive_enable & ul_pull_up_enable);
 	if (ul_multidrive_enable) {
 		p_pio->PIO_PER = ul_mask;
